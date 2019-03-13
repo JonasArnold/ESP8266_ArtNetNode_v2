@@ -127,7 +127,7 @@ const char mainPage[] PROGMEM = R"=====(
             <p class=left>Net:
             <p class=right><input name=portAnet type=number min=0 max=127 class=number />
             <p class=left>Subnet:
-            <p class=right><input name=portAsub type=number min=0 max=252 class=number />
+            <p class=right><input name=portAsub type=number min=0 max=509 class=number />
             <p class=left>Universe:
             <p class=right><input type=number min=0 max=15 name=portAuni class=number /><span name=portApix> <input type=number min=0 max=15 name=portAuni class=number /> <input type=number min=0 max=15 name=portAuni class=number /> <input type=number min=0 max=15 name=portAuni class=number /></span></p>
             <p class=left>sACN Universe:

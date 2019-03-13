@@ -21,7 +21,7 @@ void ajaxHandle() {
 
 	// Handle request to reboot into update mode
 	if (json.containsKey("success") && json["success"] == 1 && json.containsKey("doUpdate")) {
-		artRDM.end();
+		//artRDM.end();
 
 		jsonReply["success"] = 1;
 		jsonReply["doUpdate"] = 1;
@@ -144,8 +144,8 @@ bool ajaxSave(uint8_t page, JsonObject& json) {
 		}
 
 		if (!isHotspot) {
-			artRDM.setShortName(deviceSettings.nodeName);
-			artRDM.setLongName(deviceSettings.longName);
+			//artRDM.setShortName(deviceSettings.nodeName);
+			//artRDM.setLongName(deviceSettings.longName);
 		}
 
 		deviceSettings.dhcpEnable = (bool)json["dhcpEnable"];
@@ -166,7 +166,7 @@ bool ajaxSave(uint8_t page, JsonObject& json) {
 		if ((uint8_t)json["portAnet"] < 128)
 			deviceSettings.portAnet = (uint8_t)json["portAnet"];
 
-		if ((uint8_t)json["portAsub"] < 16)
+		if ((uint8_t)json["portAsub"] < 509)
 			deviceSettings.portAsub = (uint8_t)json["portAsub"];
 
 		if ((uint8_t)json["portAuni"][0] < 16)  // validate value

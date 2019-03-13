@@ -61,7 +61,7 @@ extern "C" {
 }
 
 // Versions
-#define FIRMWARE_VERSION "H801.V0.0.2"
+#define FIRMWARE_VERSION "H801.V0.0.3"
 #define ART_FIRM_VERSION 0x0200   // Firmware given over Artnet (2 bytes)
 
 /// INFO
