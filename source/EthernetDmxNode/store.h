@@ -15,7 +15,7 @@ If not, see http://www.gnu.org/licenses/
 
 
 // Change this if the settings structure changes
-#define CONFIG_VERSION "b5g"
+#define CONFIG_VERSION "801"
 
 // Dont change this
 #define CONFIG_START 0

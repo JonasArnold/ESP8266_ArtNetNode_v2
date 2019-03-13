@@ -45,7 +45,7 @@ This competition will open to the general public a couple of weeks after the pri
 #include "DmxRdmLib.h"
 #include "ArtNetE131Lib.h"
 #include "ws2812Driver.h"
-#include "wsFX.h"
+#include "wsFX.h" 
 #include "H801.h"
 
 
@@ -61,7 +61,7 @@ extern "C" {
 }
 
 // Versions
-#define FIRMWARE_VERSION "H801.V0.0.1"
+#define FIRMWARE_VERSION "H801.V0.0.2"
 #define ART_FIRM_VERSION 0x0200   // Firmware given over Artnet (2 bytes)
 
 /// INFO
