@@ -61,7 +61,7 @@ extern "C" {
 }
 
 // Versions
-#define FIRMWARE_VERSION "H801.V0.0.3"
+#define FIRMWARE_VERSION "H801.V0.0.4"
 #define ART_FIRM_VERSION 0x0200   // Firmware given over Artnet (2 bytes)
 
 /// INFO
@@ -277,6 +277,22 @@ void setup(void)
 
 void loop(void)
 {
+
+    // Handle rebooting the system
+  if (doReboot) {
+    //char c[ARTNET_NODE_REPORT_LENGTH] = "Device rebooting...";
+    //artRDM.setNodeReport(c, ARTNET_RC_POWER_OK);
+    //artRDM.artPollReply();
+
+    // Ensure all web data is sent before we reboot
+    uint32_t n = millis() + 1000;
+    while (millis() < n)
+      webServer.handleClient();
+
+    ESP.restart();
+  }
+
+  
 	// If the device lasts for 6 seconds, clear our reset timers
 	if (deviceSettings.resetCounter != 0 && millis() > 6000)
 	{
@@ -378,19 +394,6 @@ ifndef DEBUG_ENABLE  // if debug is enabled the port A is not used
 		artRDM.sendDMX(g, p, bc, dataIn, 512);
 	}
 */
-	// Handle rebooting the system
-	if (doReboot) {
-		//char c[ARTNET_NODE_REPORT_LENGTH] = "Device rebooting...";
-		//artRDM.setNodeReport(c, ARTNET_RC_POWER_OK);
-		//artRDM.artPollReply();
-
-		// Ensure all web data is sent before we reboot
-		uint32_t n = millis() + 1000;
-		while (millis() < n)
-			webServer.handleClient();
-
-		ESP.restart();
-	}
 
 /*
 	// Output status to LEDs once per second

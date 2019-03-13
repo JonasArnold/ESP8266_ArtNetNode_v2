@@ -31,8 +31,8 @@ void ajaxHandle() {
 
 		if (json["doUpdate"] == 1) {
 			// Turn pixel strips off if they're on
-			pixDriver.updateStrip(0, 0, deviceSettings.portApixConfig);
-			pixDriver.updateStrip(1, 0, deviceSettings.portBpixConfig);
+			//pixDriver.updateStrip(0, 0, deviceSettings.portApixConfig);
+			//pixDriver.updateStrip(1, 0, deviceSettings.portBpixConfig);
 
 			deviceSettings.doFirmwareUpdate = true;
 			eepromSave();
@@ -62,8 +62,8 @@ void ajaxHandle() {
 		jsonReply["message"] = "Device Restarting.";
 
 		// Turn pixel strips off if they're on
-		pixDriver.updateStrip(0, 0, deviceSettings.portApixConfig);
-		pixDriver.updateStrip(1, 0, deviceSettings.portBpixConfig);
+		//pixDriver.updateStrip(0, 0, deviceSettings.portApixConfig);
+		//pixDriver.updateStrip(1, 0, deviceSettings.portBpixConfig);
 
 		doReboot = true;
 
@@ -175,7 +175,7 @@ bool ajaxSave(uint8_t page, JsonObject& json) {
 			if (protocolTypeA != PROT_ARTNET)  // if it is sACN => start E131 with new universe
 			{
 				// if it is the same universe as it already was the function will do nothing
-				startE131(e131A, protocolTypeA, deviceSettings.portAuni[0]);
+				//startE131(e131A, protocolTypeA, deviceSettings.portAuni[0]);
 			}
 		}
 
@@ -219,10 +219,10 @@ bool ajaxSave(uint8_t page, JsonObject& json) {
 		}
 
 		// Update the Artnet class
-		artRDM.setNet(portA[0], deviceSettings.portAnet);
-		artRDM.setSubNet(portA[0], deviceSettings.portAsub);
-		artRDM.setUni(portA[0], portA[1], deviceSettings.portAuni[0]);
-		artRDM.setMerge(portA[0], portA[1], deviceSettings.portAmerge);
+		//artRDM.setNet(portA[0], deviceSettings.portAnet);
+		//artRDM.setSubNet(portA[0], deviceSettings.portAsub);
+		//artRDM.setUni(portA[0], portA[1], deviceSettings.portAuni[0]);
+		//artRDM.setMerge(portA[0], portA[1], deviceSettings.portAmerge);
 
 		// Logging Settings
     yield();
@@ -291,7 +291,7 @@ bool ajaxSave(uint8_t page, JsonObject& json) {
 			}
 		}
 
-		artRDM.artPollReply();
+		//artRDM.artPollReply();
 
 		eepromSave();
 		return true;
@@ -320,7 +320,7 @@ bool ajaxSave(uint8_t page, JsonObject& json) {
 			if (protocolTypeB != PROT_ARTNET)  // if it is sACN => start E131 with new universe
 			{
 				// if it is the same universe as it already was the function will do nothing
-				startE131(e131B, protocolTypeB, deviceSettings.portBuni[0]);
+				//startE131(e131B, protocolTypeB, deviceSettings.portBuni[0]);
 			}
 		}
 
@@ -357,10 +357,10 @@ bool ajaxSave(uint8_t page, JsonObject& json) {
 		}
 
 		// Update the Artnet class
-		artRDM.setNet(portB[0], deviceSettings.portBnet);
-		artRDM.setSubNet(portB[0], deviceSettings.portBsub);
-		artRDM.setUni(portB[0], portB[1], deviceSettings.portBuni[0]);
-		artRDM.setMerge(portB[0], portB[1], deviceSettings.portBmerge);
+		//artRDM.setNet(portB[0], deviceSettings.portBnet);
+		//artRDM.setSubNet(portB[0], deviceSettings.portBsub);
+		//artRDM.setUni(portB[0], portB[1], deviceSettings.portBuni[0]);
+		//artRDM.setMerge(portB[0], portB[1], deviceSettings.portBmerge);
 
 		// Logging Settings
     yield();
@@ -430,7 +430,7 @@ bool ajaxSave(uint8_t page, JsonObject& json) {
 			}
 		}
 
-		artRDM.artPollReply();
+		//artRDM.artPollReply();
 
 		eepromSave();
 		return true;
