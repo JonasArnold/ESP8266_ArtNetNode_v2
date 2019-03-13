@@ -20,11 +20,11 @@ install:
  - git clone https://github.com/JonasArnold/DmxRdmLib_esp8266.git /usr/local/share/arduino/libraries/DmxRdmLib
  - git clone https://github.com/forkineye/E131.git /usr/local/share/arduino/libraries/E131
  - arduino --install-boards esp8266:esp8266
- - arduino --board esp8266:esp8266:d1_mini --save-prefs
+ - arduino --board esp8266:esp8266:generic --save-prefs
  - arduino --pref "compiler.warning_level=all" --save-prefs
  
 script:
- - arduino --verify --board esp8266:esp8266:d1_mini $PWD/source/EthernetDmxNode/EthernetDmxNode.ino
+ - arduino --verify --board esp8266:esp8266:generic $PWD/source/EthernetDmxNode/EthernetDmxNode.ino
  
 notifications:
   email:
