@@ -87,9 +87,9 @@ void portSetup()
 		LogLn("Port A configured as Output for universe "); Log((String)portA[0]); Log(" in subnet "); Log((String)portA[1]); LogLn(".");
 		delay(100); // wait until logged
 
-		setDmxLed(DMX_ACT_LED_A, true);      // led bright when output
+		//setDmxLed(DMX_ACT_LED_A, true);      // led bright when output
 
-		dmxA.begin(DMX_DIR_A, artRDM.getDMX(portA[0], portA[1]));
+		//dmxA.begin(DMX_DIR_A, artRDM.getDMX(portA[0], portA[1]));
 		if (deviceSettings.portAmode == TYPE_RDM_OUT && !dmxA.rdmEnabled())
 		{
 			dmxA.rdmEnable(ESTA_MAN, ESTA_DEV);
@@ -101,9 +101,9 @@ void portSetup()
 	else if (deviceSettings.portAmode == TYPE_DMX_IN)
 	{
 		LogLn("Port A configured as Input.");
-		setDmxLed(DMX_ACT_LED_A, false);    // led dark when input
+		//setDmxLed(DMX_ACT_LED_A, false);    // led dark when input
 
-		dmxA.begin(DMX_DIR_A, artRDM.getDMX(portA[0], portA[1]));
+		//dmxA.begin(DMX_DIR_A, artRDM.getDMX(portA[0], portA[1]));
 		dmxA.dmxIn(true);
 		dmxA.setInputCallback(dmxIn);
 
@@ -113,10 +113,10 @@ void portSetup()
 	else if (deviceSettings.portAmode == TYPE_WS2812)
 	{
 		LogLn("Port A configured as WS2812.");
-		setDmxLed(DMX_ACT_LED_A, true);     // led bright when TYPE_WS2812
+		//setDmxLed(DMX_ACT_LED_A, true);     // led bright when TYPE_WS2812
 
-		digitalWrite(DMX_DIR_A, HIGH);      // manually set to high
-		pixDriver.setStrip(0, DMX_TX_A, deviceSettings.portAnumPix, deviceSettings.portApixConfig);
+		//digitalWrite(DMX_DIR_A, HIGH);      // manually set to high
+		//pixDriver.setStrip(0, DMX_TX_A, deviceSettings.portAnumPix, deviceSettings.portApixConfig);
 	}
 #endif
 
@@ -126,27 +126,27 @@ void portSetup()
 		Log("Port B configured as Output for universe "); Log((String)portB[0]); Log(" in subnet "); Log((String)portB[1]); LogLn(".");
 		delay(100); // wait until logged
 
-		setDmxLed(DMX_ACT_LED_B, true);     // led bright when output
+		//setDmxLed(DMX_ACT_LED_B, true);     // led bright when output
 
-		dmxB.begin(DMX_DIR_B, artRDM.getDMX(portB[0], portB[1]));
-		if (deviceSettings.portBmode == TYPE_RDM_OUT && !dmxB.rdmEnabled()) {
+		//dmxB.begin(DMX_DIR_B, artRDM.getDMX(portB[0], portB[1]));
+		/*if (deviceSettings.portBmode == TYPE_RDM_OUT && !dmxB.rdmEnabled()) {
 			dmxB.rdmEnable(ESTA_MAN, ESTA_DEV);
 			dmxB.rdmSetCallBack(rdmReceivedB);
 			dmxB.todSetCallBack(sendTodB);
-		}
+		}*/
 	}
 	/// Port B cannot be configured as Input (only 1 Input allowed)
 	else if (deviceSettings.portBmode == TYPE_WS2812)
 	{
 		LogLn("Port B configured as WS2812.");
-		setDmxLed(DMX_ACT_LED_B, true);     // led bright when TYPE_WS2812
+		//setDmxLed(DMX_ACT_LED_B, true);     // led bright when TYPE_WS2812
 
-		digitalWrite(DMX_DIR_B, HIGH);
-		pixDriver.setStrip(1, DMX_TX_B, deviceSettings.portBnumPix, deviceSettings.portBpixConfig);
+		//digitalWrite(DMX_DIR_B, HIGH);
+		//pixDriver.setStrip(1, DMX_TX_B, deviceSettings.portBnumPix, deviceSettings.portBpixConfig);
 	}
 	else
 	{
-		setDmxLed(DMX_ACT_LED_B, false);     // led bright when other
+		//setDmxLed(DMX_ACT_LED_B, false);     // led bright when other
 	}
 
 	pixDriver.allowInterruptSingle = WS2812_ALLOW_INT_SINGLE;

@@ -46,6 +46,7 @@ This competition will open to the general public a couple of weeks after the pri
 #include "ArtNetE131Lib.h"
 #include "ws2812Driver.h"
 #include "wsFX.h"
+#include "H801.h"
 
 
 // Include external files
@@ -60,7 +61,7 @@ extern "C" {
 }
 
 // Versions
-#define FIRMWARE_VERSION "J.V2.1.0"
+#define FIRMWARE_VERSION "H801.V0.0.1"
 #define ART_FIRM_VERSION 0x0200   // Firmware given over Artnet (2 bytes)
 
 /// INFO
@@ -109,6 +110,9 @@ bool newDmxIn = false;
 bool doReboot = false;
 byte* dataIn;
 
+E131 e131;
+H801 h801;
+
 /// Logs a message without newline at the end. Only if Debug is enabled.
 void Log(String message)
 {
@@ -130,18 +134,18 @@ void setup(void)
 {
 	// Set direction to "input" to avoid boot garbage being sent out
 #ifndef DEBUG_ENABLE  // if debug is enabled the port A is not used
-	pinMode(DMX_DIR_A, INPUT);
-	digitalWrite(DMX_DIR_A, LOW);
+	//pinMode(DMX_DIR_A, INPUT);
+	//digitalWrite(DMX_DIR_A, LOW);
 #endif
 
-	pinMode(DMX_DIR_B, INPUT);
-	digitalWrite(DMX_DIR_B, LOW);
+	//pinMode(DMX_DIR_B, INPUT);
+	//digitalWrite(DMX_DIR_B, LOW);
 
 	// Pin Modes of Status LEDs
-	pinMode(DMX_ACT_LED_A, OUTPUT);
-	pinMode(DMX_ACT_LED_B, OUTPUT);
-	pinMode(STATUS_LED_S_R, OUTPUT);
-	pinMode(STATUS_LED_S_G, OUTPUT);
+	//pinMode(DMX_ACT_LED_A, OUTPUT);
+	//pinMode(DMX_ACT_LED_B, OUTPUT);
+	//pinMode(STATUS_LED_S_R, OUTPUT);
+	//pinMode(STATUS_LED_S_G, OUTPUT);
 	setStatusLed(RED);
 	doStatusLedOutput();
 
@@ -160,7 +164,7 @@ void setup(void)
 
 	// If the Reset Settings is activated
 #ifdef RESET_ENABLE
-	pinMode(SETTINGS_RESET, INPUT);
+	/*pinMode(SETTINGS_RESET, INPUT);
 	delay(5);
 
 	// button pressed = low reading
@@ -172,7 +176,7 @@ void setup(void)
 			resetDefaults = true;
 			LogLn("Settings Reset pressed: Settings will be reset.");
 		}
-	}
+	}*/
 #endif
 
 	// Start EEPROM
@@ -223,14 +227,46 @@ void setup(void)
 			deviceSettings.portBmode = TYPE_DMX_OUT;
 
 		// Setup Artnet Ports & Callbacks
-		artStart();
+		//artStart();
+
+     // Setup sACN
+
+     // setup check leds
+     h801.setR(255);
+     delay(500);
+     h801.setR(0);
+     h801.setG(255);
+     delay(500);
+     h801.setG(0);
+     h801.setB(255);
+     delay(500);
+     h801.setB(0);
+
+     int thisUniverse = deviceSettings.portAnet;
+     /*for(int i=0; i<thisUniverse; i++)
+     {
+      h801.setR(255);
+      delay(500);
+      h801.setR(0);
+      delay(500);
+     }*/
+
+     e131.begin(E131_MULTICAST, thisUniverse);
+     //e131.beginMulticast(deviceSettings.wifiSSID, deviceSettings.wifiPass, ); /* via Multicast for Universe 4 */
+     //delay(1000);
+     //h801.setR(0);
+
+     // blink the times 
+     
+     // End sACN Setup
+
 
 		// Don't open any ports for a bit to let the ESP spill it's garbage to serial
 		while (millis() < 3500)
 			yield();
 
 		// Port Setup
-		portSetup();
+		//portSetup();
 
 	}
 	else  // if do firmware update
@@ -251,23 +287,52 @@ void loop(void)
 
 	webServer.handleClient();
 
+  // Handle sACN
+  uint16_t num_channels = e131.parsePacket();
+
+  /* Process channel data if we have it */
+  if (num_channels) {
+
+    // send it to serial
+    Serial.printf("Universe %u / %u Channels | Packet#: %u / Errors: %u / CH1: %u\n",
+      e131.universe,              // The Universe for this packet
+      num_channels,               // Number of channels in this packet
+      e131.stats.num_packets,     // Packet counter
+      e131.stats.packet_errors,   // Packet error counter
+      e131.data[0]);              // Dimmer data for Channel 1
+
+    int thisUniverse = deviceSettings.portAnet;
+
+    if (e131.universe == thisUniverse)
+    {
+      int startChannel = deviceSettings.portAsub;
+      h801.setR(e131.data[startChannel - 1]);  // start channel is 0
+      h801.setG(e131.data[startChannel]);
+      h801.setB(e131.data[startChannel + 1]);
+      h801.setW1(e131.data[startChannel + 2]);
+      h801.setW2(e131.data[startChannel + 3]);
+    }
+  }
+  // END sACN
+
 	// Get the node details and handle Artnet
-	doNodeReport();
-	artRDM.handler();
-  e131handler();
+	//doNodeReport();
+	//artRDM.handler();
+  //e131handler();
 
 	yield();
 
 	// DMX handlers
-#ifndef DEBUG_ENABLE  // if debug is enabled the port A is not used
+ /*
+ifndef DEBUG_ENABLE  // if debug is enabled the port A is not used
 	dmxA.handler();
 #endif
 	dmxB.handler();
 
-	// Handle Serial commands
+	 Handle Serial commands
 	if (Serial.available() > 0)
 	{
-		String incomingData = Serial.readString();
+ 	  String incomingData = Serial.readString();
 		if (incomingData.equals("portA"))
 		{
 			Log("ArtNet Settings for Port A. Uni: "); Log((String)deviceSettings.portAuni[0]); Log(" Subnet: "); Log((String)deviceSettings.portAsub); Log(" Protocol Type: "); Log((String)deviceSettings.portAprot); LogLn(".");
@@ -312,12 +377,12 @@ void loop(void)
 		IPAddress bc = deviceSettings.dmxInBroadcast;
 		artRDM.sendDMX(g, p, bc, dataIn, 512);
 	}
-
+*/
 	// Handle rebooting the system
 	if (doReboot) {
-		char c[ARTNET_NODE_REPORT_LENGTH] = "Device rebooting...";
-		artRDM.setNodeReport(c, ARTNET_RC_POWER_OK);
-		artRDM.artPollReply();
+		//char c[ARTNET_NODE_REPORT_LENGTH] = "Device rebooting...";
+		//artRDM.setNodeReport(c, ARTNET_RC_POWER_OK);
+		//artRDM.artPollReply();
 
 		// Ensure all web data is sent before we reboot
 		uint32_t n = millis() + 1000;
@@ -327,7 +392,7 @@ void loop(void)
 		ESP.restart();
 	}
 
-
+/*
 	// Output status to LEDs once per second
 	if (statusTimer < millis()) {
 
@@ -343,6 +408,7 @@ void loop(void)
 		doStatusLedOutput();
 		statusTimer = millis() + 1000;
 	}
+ */
 }
 
 void e131handler()
@@ -353,9 +419,9 @@ void e131handler()
   delay(10);
 	if (numChannelsA) {
     LogLn("Got E131 data on A");
-		setDmxLed(DMX_ACT_LED_A, true);   // flash Led => to High
+		//setDmxLed(DMX_ACT_LED_A, true);   // flash Led => to High
 		dmxA.setChans(e131A.data);   // set dmx channels
-		setDmxLed(DMX_ACT_LED_A, false);   // flash Led => to Low
+		//setDmxLed(DMX_ACT_LED_A, false);   // flash Led => to Low
 	}
 #endif // !DEBUG_ENABLED
 
@@ -365,9 +431,9 @@ void e131handler()
   delay(10);
 	if (numChannelsB) {
     LogLn("Got E131 data on B");
-		setDmxLed(DMX_ACT_LED_B, true);   // flash Led => to High
+		//setDmxLed(DMX_ACT_LED_B, true);   // flash Led => to High
 		dmxB.setChans(e131B.data);    // set dmx channels
-		setDmxLed(DMX_ACT_LED_B, false);   // flash Led => to Low
+		//setDmxLed(DMX_ACT_LED_B, false);   // flash Led => to Low
 	}
 
 }
@@ -377,7 +443,7 @@ void dmxHandle(uint8_t group, uint8_t port, uint16_t numChans, bool syncEnabled)
 {
 	if (portB[0] == group)
 	{
-		setDmxLed(DMX_ACT_LED_B, true);   // flash Led => to High
+		//setDmxLed(DMX_ACT_LED_B, true);   // flash Led => to High
 
 		if (deviceSettings.portBmode == TYPE_WS2812) 
 		{
@@ -419,13 +485,15 @@ void dmxHandle(uint8_t group, uint8_t port, uint16_t numChans, bool syncEnabled)
 			dmxB.chanUpdate(numChans);
 		}
 
-		setDmxLed(DMX_ACT_LED_B, false);   // flash Led => to High
+   
+
+		//setDmxLed(DMX_ACT_LED_B, false);   // flash Led => to High
 	}
 
 #ifndef DEBUG_ENABLE  // if debug is enabled the port A is not used
 	else if (portA[0] == group)
 	{
-		setDmxLed(DMX_ACT_LED_A, true);   // flash Led => to High
+		//setDmxLed(DMX_ACT_LED_A, true);   // flash Led => to High
 
 		if (deviceSettings.portAmode == TYPE_WS2812)
 		{
@@ -471,7 +539,7 @@ void dmxHandle(uint8_t group, uint8_t port, uint16_t numChans, bool syncEnabled)
 			dmxA.chanUpdate(numChans);
 		}
 
-		setDmxLed(DMX_ACT_LED_A, false);   // flash Led => to Low
+		//setDmxLed(DMX_ACT_LED_A, false);   // flash Led => to Low
 
 	}
 #endif
@@ -687,20 +755,20 @@ void setRGled(bool r, bool g)
 {
 	if (r)
 	{
-		analogWrite(STATUS_LED_S_R, STATUS_LED_BRIGHTNESS);
+		//analogWrite(STATUS_LED_S_R, STATUS_LED_BRIGHTNESS);
 	}
 	else
 	{
-		analogWrite(STATUS_LED_S_R, 0);
+		//analogWrite(STATUS_LED_S_R, 0);
 	}
 
 	if (g)
 	{
-		analogWrite(STATUS_LED_S_G, STATUS_LED_BRIGHTNESS);
+		//analogWrite(STATUS_LED_S_G, STATUS_LED_BRIGHTNESS);
 	}
 	else
 	{
-		analogWrite(STATUS_LED_S_G, 0);
+		//analogWrite(STATUS_LED_S_G, 0);
 	}
 }
 
@@ -709,10 +777,10 @@ void setDmxLed(uint8_t pin, bool on)
 {
 	if (on)
 	{
-		analogWrite(pin, DMX_ACT_LED_BRIGHTNESS);
+		//analogWrite(pin, DMX_ACT_LED_BRIGHTNESS);
 	}
 	else
 	{
-		analogWrite(pin, 0);
+		//analogWrite(pin, 0);
 	}
 }
